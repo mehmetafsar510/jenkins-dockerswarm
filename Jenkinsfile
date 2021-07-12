@@ -135,7 +135,7 @@ pipeline {
             echo 'Deleting Cloudformation Stack due to the Failure'
             sh 'aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${AWS_STACK_NAME}'
             echo 'Deleting .env file'
-            sh  'rm -rf "${WORKSPACE}/.env"'
+            sh  "rm -rf '${WORKSPACE}/.env'"
         }
         success {
             echo 'You are the man/woman...'
