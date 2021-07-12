@@ -50,7 +50,7 @@ pipeline {
             steps {
                 script {
                   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    withCredentials([usernamePassword(credentialsId: 'example-secure', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    withCredentials([usernamePassword(credentialsId: '577efdb5-19ed-4f10-a4af-09d9dda5cbbe', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
                         writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME}"
                         sh "cd ${WORKSPACE}"
