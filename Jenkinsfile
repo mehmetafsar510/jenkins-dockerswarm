@@ -36,6 +36,7 @@ pipeline {
                 sh 'docker build --force-rm -t "$ECR_REGISTRY/$APP_REPO_NAME:latest" .'
                 sh 'docker image ls'
             }
+        }
         stage('pushing Docker image to ECR Repository'){   
             steps {
                 echo 'pushing Docker image to ECR Repository'
