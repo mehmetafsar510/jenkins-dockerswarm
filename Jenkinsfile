@@ -45,16 +45,24 @@ pipeline {
 
             }
         }
-        stage('pushing .env to Jenkins to Git Repo'){ 
-            steps {
-                echo 'pushing .env jenkins to Git Repository'
-                writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME}"
-                sh "cd ${WORKSPACE}"
-                sh "git add ."
-                sh 'git commit -m "Added file with automated Jenikins job"'
-                sh "git push"
 
+        stage('pushing .env to Jenkins to Git Repo') {
+            steps {
+                script {
+                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    withCredentials([usernamePassword(credentialsId: 'example-secure', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+                        writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME}"
+                        sh "cd ${WORKSPACE}"
+                        sh "git config user.email admin@example.com"
+                        sh "git config user.name example"
+                        sh "git add ."
+                        sh "git commit -m 'Triggered Build: ${env.BUILD_NUMBER}'"
+                        sh "git push https://${GIT_USERNAME}:${encodedPassword}@github.com/${GIT_USERNAME}/${GIT_FOLDER}.git"
+                }
+              }
             }
+          }
         }
         stage('creating infrastructure for the Application') {
             steps {
