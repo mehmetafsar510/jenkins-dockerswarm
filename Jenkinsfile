@@ -48,7 +48,7 @@ pipeline {
         stage('pushing .env to Jenkins to Git Repo'){ 
             steps {
                 echo 'pushing .env jenkins to Git Repository'
-                sh "eval '\$(echo -e ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME} > ${WORKSPACE}/.env)'"
+                writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME}"
                 sh "cd ${WORKSPACE}"
                 sh "git add ."
                 sh 'git commit -m "Added file with automated Jenikins job"'
