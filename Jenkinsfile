@@ -95,7 +95,7 @@ pipeline {
                 sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} git clone ${GIT_URL}'
                 sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} chmod 777 ${HOME_FOLDER}/${GIT_FOLDER}'
                 sleep(5)
-                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} sudo '\$(echo -e ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME} >> ${HOME_FOLDER}/${GIT_FOLDER}/.env)'"
+                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} sudo '\$(echo -e ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME} > ${HOME_FOLDER}/${GIT_FOLDER}/.env)'"
                 sleep(10)
                 sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} docker stack deploy --with-registry-auth -c ${HOME_FOLDER}/${GIT_FOLDER}/docker-compose.yml ${APP_NAME}'
             }
