@@ -36,12 +36,22 @@ pipeline {
                 sh 'docker build --force-rm -t "$ECR_REGISTRY/$APP_REPO_NAME:latest" .'
                 sh 'docker image ls'
             }
-        }
-        stage('pushing Docker image to ECR Repository'){
+        stage('pushing Docker image to ECR Repository'){   
             steps {
                 echo 'pushing Docker image to ECR Repository'
                 sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin "$ECR_REGISTRY"'
                 sh 'docker push "$ECR_REGISTRY/$APP_REPO_NAME:latest"'
+
+            }
+        }
+        stage('pushing .env to Jenkins to Git Repo'){ 
+            steps {
+                echo 'pushing .env jenkins to Git Repository'
+                sh "eval '\$(echo -e ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME} > ${WORKSPACE}/.env)'"
+                sh "cd ${WORKSPACE}"
+                sh "git add ."
+                sh 'git commit -m "Added file with automated Jenikins job"'
+                sh "git push"
 
             }
         }
@@ -93,9 +103,6 @@ pipeline {
             steps {
                 echo "Cloning and Deploying App on Swarm using Grand Master with Instance Id: $MASTER_INSTANCE_ID"
                 sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} git clone ${GIT_URL}'
-                sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} chmod 777 -R ${HOME_FOLDER}/${GIT_FOLDER}'
-                sleep(5)
-                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} eval '\$(echo -e ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME} > ${HOME_FOLDER}/${GIT_FOLDER}/.env)'"
                 sleep(10)
                 sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} docker stack deploy --with-registry-auth -c ${HOME_FOLDER}/${GIT_FOLDER}/docker-compose.yml ${APP_NAME}'
             }
