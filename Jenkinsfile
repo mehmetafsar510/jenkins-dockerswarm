@@ -53,12 +53,13 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: '577efdb5-19ed-4f10-a4af-09d9dda5cbbe', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
                         writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}  \nAPP_REPO_NAME=${APP_REPO_NAME}"
+                        echo 'pushing .env to Jenkins to Git Repo'
                         sh "cd ${WORKSPACE}"
                         sh "git config user.email admin@example.com"
                         sh "git config user.name example"
                         sh "git add ."
                         sh "git commit -m 'Triggered Build: ${env.BUILD_NUMBER}'"
-                        sh "git push https://${GIT_USERNAME}:${encodedPassword}@github.com/${GIT_USERNAME}/${GIT_FOLDER}.git"
+                        sh "git push https://${GIT_USERNAME}:${encodedPassword}@github.com/${GIT_USERNAME}/${GIT_FOLDER}.git HEAD:master"
                 }
               }
             }
