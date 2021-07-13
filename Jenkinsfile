@@ -136,6 +136,11 @@ pipeline {
             sh 'aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${AWS_STACK_NAME}'
             echo 'Deleting .env file'
             sh  "rm -rf '${WORKSPACE}/.env'"
+            sh "cd ${WORKSPACE}"
+            sh "git add ."
+            sh "git commit -m 'Triggered Build: ${env.BUILD_NUMBER}'"
+            sh "git push https://${GIT_USERNAME}:${encodedPassword}@github.com/${GIT_USERNAME}/${GIT_FOLDER}.git HEAD:master"
+
         }
         success {
             echo 'You are the man/woman...'
