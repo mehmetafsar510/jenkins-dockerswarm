@@ -124,9 +124,7 @@ pipeline {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
         }
-        failure {
-            withCredentials([usernamePassword(credentialsId: '90f1ed29-7faf-4e53-80ea-7049cc40fd39', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8') 
+        failure { 
                 echo 'Delete the Image Repository on ECR due to the Failure'
                 sh """
                     aws ecr delete-repository \
@@ -136,6 +134,8 @@ pipeline {
                     """
                 echo 'Deleting Cloudformation Stack due to the Failure'
                 sh 'aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${AWS_STACK_NAME}'
+            withCredentials([usernamePassword(credentialsId: '90f1ed29-7faf-4e53-80ea-7049cc40fd39', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')    
                 echo 'Deleting .env file'
                 sh  "rm -rf '${WORKSPACE}/.env'"
                 sh "cd ${WORKSPACE}"
