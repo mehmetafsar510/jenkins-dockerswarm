@@ -125,22 +125,24 @@ pipeline {
             sh 'docker image prune -af'
         }
         failure {
-            echo 'Delete the Image Repository on ECR due to the Failure'
-            sh """
-                aws ecr delete-repository \
-                  --repository-name ${APP_REPO_NAME} \
-                  --region ${AWS_REGION}\
-                  --force
-                """
-            echo 'Deleting Cloudformation Stack due to the Failure'
-            sh 'aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${AWS_STACK_NAME}'
-            echo 'Deleting .env file'
-            sh  "rm -rf '${WORKSPACE}/.env'"
-            sh "cd ${WORKSPACE}"
-            sh "git add ."
-            sh "git commit -m 'Triggered Build: ${env.BUILD_NUMBER}'"
-            sh "git push https://${GIT_USERNAME}:${encodedPassword}@github.com/${GIT_USERNAME}/${GIT_FOLDER}.git HEAD:master"
-
+            withCredentials([usernamePassword(credentialsId: '90f1ed29-7faf-4e53-80ea-7049cc40fd39', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8') 
+                echo 'Delete the Image Repository on ECR due to the Failure'
+                sh """
+                    aws ecr delete-repository \
+                      --repository-name ${APP_REPO_NAME} \
+                      --region ${AWS_REGION}\
+                      --force
+                    """
+                echo 'Deleting Cloudformation Stack due to the Failure'
+                sh 'aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${AWS_STACK_NAME}'
+                echo 'Deleting .env file'
+                sh  "rm -rf '${WORKSPACE}/.env'"
+                sh "cd ${WORKSPACE}"
+                sh "git add ."
+                sh "git commit -m 'Triggered Build: ${env.BUILD_NUMBER}'"
+                sh "git push https://${GIT_USERNAME}:${encodedPassword}@github.com/${GIT_USERNAME}/${GIT_FOLDER}.git HEAD:master"
+            }◘
         }
         success {
             echo 'You are the man/woman...'
