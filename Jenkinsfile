@@ -114,7 +114,7 @@ pipeline {
                 echo "Cloning and Deploying App on Swarm using Grand Master with Instance Id: $MASTER_INSTANCE_ID"
                 sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} git clone ${GIT_URL}'
                 sleep(10)
-                sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} cd ${HOME_FOLDER}/${GIT_FOLDER} && docker stack deploy --with-registry-auth -c <(docker-compose config) ${HOME_FOLDER}/${GIT_FOLDER}/docker-compose.yml ${APP_NAME}'
+                sh 'mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} cd ${HOME_FOLDER}/${GIT_FOLDER} && docker-compose config | docker stack deploy --with-registry-auth -c  ${HOME_FOLDER}/${GIT_FOLDER}/docker-compose.yml ${APP_NAME}'
             }
         }
     }
