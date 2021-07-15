@@ -115,7 +115,7 @@ pipeline {
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} git clone ${GIT_URL}"
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} cp -R ${HOME_FOLDER}/${GIT_FOLDER}/* ${HOME_FOLDER}/"
                 sleep(10)
-                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} docker stack deploy --with-registry-auth -c \<\(docker-compose config\) ${APP_NAME}"
+                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} docker-compose config | docker stack deploy --with-registry-auth -c docker-compose.yml ${APP_NAME}"
             }
         }
     }
