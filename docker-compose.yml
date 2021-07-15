@@ -21,7 +21,6 @@ services:
 
   app-server:
     image: "${ECR_REGISTRY}/${APP_REPO_NAME}:latest" #646075469151.dkr.ecr.us-east-1.amazonaws.com/clarusway-repo/phonebook-app:latest 
-    env_file: ./.env 
     deploy:
       mode: global
       update_config:
