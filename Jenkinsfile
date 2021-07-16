@@ -113,8 +113,9 @@ pipeline {
             steps {
                 echo "Cloning and Deploying App on Swarm using Grand Master with Instance Id: $MASTER_INSTANCE_ID"
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} git clone ${GIT_URL}"
+                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} chmod 777 ${HOME_FOLDER}/${GIT_FOLDER}/deploy.sh "
                 sleep(10)
-                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} docker-compose config --project-directory ${HOME_FOLDER}/${GIT_FOLDER} | docker stack deploy --with-registry-auth -c - ${APP_NAME}"
+                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} bash deploy.sh"
             }
         }
     }
@@ -123,7 +124,33 @@ pipeline {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
         }
-        
+        failure { 
+                echo 'Delete the Image Repository on ECR due to the Failure'
+                sh """
+                    aws ecr delete-repository \
+                      --repository-name ${APP_REPO_NAME} \
+                      --region ${AWS_REGION}\
+                      --force
+                    """
+                echo 'Deleting Cloudformation Stack due to the Failure'
+                sh 'aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${AWS_STACK_NAME}'
+            script {
+                  catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    withCredentials([usernamePassword(credentialsId: '60c88ab8-c26c-4696-9186-43ee663e8902', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+                        writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}\nAPP_REPO_NAME=${APP_REPO_NAME}"
+                        echo 'Deleting .env file'
+                        sh  "rm -rf '${WORKSPACE}/.env'"
+                        sh "cd ${WORKSPACE}"
+                        sh "git config user.email admin@example.com"
+                        sh "git config user.name example"
+                        sh "git add ."
+                        sh "git commit -m 'Triggered Build: ${env.BUILD_NUMBER}'"
+                        sh "git push https://${GIT_USERNAME}:${encodedPassword}@github.com/${GIT_USERNAME}/${GIT_FOLDER}.git HEAD:master"
+                }
+              }
+            }
+        }
         success {
             echo 'You are the man/woman...'
         }
