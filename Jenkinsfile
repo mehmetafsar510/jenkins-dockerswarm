@@ -33,7 +33,7 @@ pipeline {
         stage('building Docker Image') {
             steps {
                 echo 'building Docker Image'
-                sh 'docker build -t "$ECR_REGISTRY/$APP_REPO_NAME:latest" .'
+                sh 'docker build --force-rm -t "$ECR_REGISTRY/$APP_REPO_NAME:latest" .'
                 sh 'docker image ls'
             }
         }
