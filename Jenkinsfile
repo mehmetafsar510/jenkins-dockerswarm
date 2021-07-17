@@ -52,7 +52,7 @@ pipeline {
                   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     withCredentials([usernamePassword(credentialsId: '60c88ab8-c26c-4696-9186-43ee663e8902', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
-                        writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}\nAPP_REPO_NAME=${APP_REPO_NAME}"
+                        writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}\nAPP_REPO_NAME=${APP_REPO_NAME}:latest"
                         echo 'pushing .env to Jenkins to Git Repository'
                         sh "cd ${WORKSPACE}"
                         sh "git config user.email admin@example.com"
