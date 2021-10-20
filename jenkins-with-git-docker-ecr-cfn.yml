@@ -73,7 +73,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-02354e95b39ca8dec
-      InstanceType: t2.micro
+      InstanceType: t2.small
       KeyName: !Ref KeyPairName
       IamInstanceProfile: !Ref EC2ConnectProfile
       SecurityGroupIds:
@@ -89,6 +89,7 @@ Resources:
           yum update -y
           hostnamectl set-hostname jenkins-server
           yum install git -y
+          amazon-linux-extras install epel -y
           amazon-linux-extras install java-openjdk11 -y
           wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo
           rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key

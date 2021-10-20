@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'master'
-    }
+    agent any
     environment{
         PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
         AWS_REGION = "us-east-1"
@@ -18,16 +16,22 @@ pipeline {
     }
 
     stages {
-        stage('creating ECR Repository') {
-            steps {
+        stage('creating ECR Repository'){
+            agent any
+            steps{
                 echo 'creating ECR Repository'
-                sh """
-                aws ecr create-repository \
-                  --repository-name ${APP_REPO_NAME} \
-                  --image-scanning-configuration scanOnPush=false \
-                  --image-tag-mutability MUTABLE \
-                  --region ${AWS_REGION}
-                """
+                sh '''
+                    RepoArn=$(aws ecr describe-repositories | grep ${APP_REPO} |cut -d '"' -f 4| head -n 1 )  || true
+                    if [ "$RepoArn" == '' ]
+                    then
+                        aws ecr create-repository \
+                          --repository-name ${APP_REPO} \
+                          --image-scanning-configuration scanOnPush=false \
+                          --image-tag-mutability MUTABLE \
+                          --region ${AWS_REGION}
+                        
+                    fi
+                '''
             }
         }
         stage('building Docker Image') {
@@ -50,7 +54,7 @@ pipeline {
             steps {
                 script {
                   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    withCredentials([usernamePassword(credentialsId: '60c88ab8-c26c-4696-9186-43ee663e8902', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    withCredentials([usernamePassword(credentialsId: 'git-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
                         writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}\nAPP_REPO_NAME=${APP_REPO_NAME}:latest"
                         echo 'pushing .env to Jenkins to Git Repository'
@@ -136,7 +140,7 @@ pipeline {
                 sh 'aws cloudformation delete-stack --region ${AWS_REGION} --stack-name ${AWS_STACK_NAME}'
             script {
                   catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    withCredentials([usernamePassword(credentialsId: '60c88ab8-c26c-4696-9186-43ee663e8902', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    withCredentials([usernamePassword(credentialsId: 'git-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
                         writeFile file: '.env', text: "ECR_REGISTRY=${ECR_REGISTRY}\nAPP_REPO_NAME=${APP_REPO_NAME}"
                         echo 'Deleting .env file'
