@@ -21,7 +21,7 @@ pipeline {
             steps{
                 echo 'creating ECR Repository'
                 sh '''
-                    RepoArn=$(aws ecr describe-repositories | grep ${APP_REPO_NAME} |cut -d '"' -f 4| head -n 1 )  || true
+                    RepoArn=$(aws ecr describe-repositories --region ${AWS_REGION} | grep ${APP_REPO_NAME} |cut -d '"' -f 4| head -n 1 )  || true
                     if [ "$RepoArn" == '' ]
                     then
                         aws ecr create-repository \
