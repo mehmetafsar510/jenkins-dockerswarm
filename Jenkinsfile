@@ -21,11 +21,11 @@ pipeline {
             steps{
                 echo 'creating ECR Repository'
                 sh '''
-                    RepoArn=$(aws ecr describe-repositories | grep ${APP_REPO} |cut -d '"' -f 4| head -n 1 )  || true
+                    RepoArn=$(aws ecr describe-repositories | grep ${APP_REPO_NAME} |cut -d '"' -f 4| head -n 1 )  || true
                     if [ "$RepoArn" == '' ]
                     then
                         aws ecr create-repository \
-                          --repository-name ${APP_REPO} \
+                          --repository-name ${APP_REPO_NAME} \
                           --image-scanning-configuration scanOnPush=false \
                           --image-tag-mutability MUTABLE \
                           --region ${AWS_REGION}
