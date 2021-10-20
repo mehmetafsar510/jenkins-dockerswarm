@@ -157,6 +157,7 @@ pipeline {
         }
         success {
             echo 'You are the man/woman...'
+            echo 'You can visit http://${MASTER_INSTANCE_PUBLIC_IP}:8080 and  http://${MASTER_INSTANCE_PUBLIC_IP}'
         }
     }
 }
