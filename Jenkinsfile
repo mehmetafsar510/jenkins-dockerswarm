@@ -9,7 +9,7 @@ pipeline {
         APP_NAME = "phonebook"
         DOMAIN_NAME = "mehmetafsar.net"
         FQDN = "clarus.mehmetafsar.net"
-        AWS_STACK_NAME = "Mehmet-Phonebook-App"
+        AWS_STACK_NAME = "Mehmet-Phonebook-App-qa"
         CFN_TEMPLATE="phonebook-docker-swarm-cfn-template.yml"
         CFN_KEYPAIR="thedoctor"
         HOME_FOLDER = "/home/ec2-user"
