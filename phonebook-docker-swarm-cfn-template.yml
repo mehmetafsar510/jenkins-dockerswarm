@@ -57,6 +57,10 @@ Resources:
           ToPort: 80
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
@@ -80,12 +84,16 @@ Resources:
           FromPort: 8080
           ToPort: 8080
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
   ManagerLT:
     Type: "AWS::EC2::LaunchTemplate"
     Properties:
       LaunchTemplateData:
-        ImageId: ami-04d29b6f966df1537
-        InstanceType: t2.micro
+        ImageId: ami-02354e95b39ca8dec
+        InstanceType: t2.mediumn
         KeyName: !Ref KeyPairName
         IamInstanceProfile: 
           Arn: !GetAtt EC2ConnectProfile.Arn
@@ -122,8 +130,8 @@ Resources:
     Type: "AWS::EC2::LaunchTemplate"
     Properties:
       LaunchTemplateData:
-        ImageId: ami-04d29b6f966df1537
-        InstanceType: t2.micro
+        ImageId: ami-02354e95b39ca8dec
+        InstanceType: t2.medium
         KeyName: !Ref KeyPairName
         IamInstanceProfile: 
           Arn: !GetAtt EC2ConnectProfile.Arn
@@ -159,7 +167,7 @@ Resources:
   DockerManager1:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-04d29b6f966df1537
+      ImageId: ami-02354e95b39ca8dec
       InstanceType: t2.medium
       KeyName: !Ref KeyPairName
       IamInstanceProfile: !Ref EC2ConnectProfile
