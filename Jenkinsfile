@@ -153,7 +153,7 @@ pipeline {
                 sh "sed -i 's/{SERVERIP}/${MASTER_INSTANCE_PUBLIC_IP}/g' ssl-script.sh"
                 sh "sed -i 's/{FullDomainName}/${FQDN}/g' ssl-script.sh"
                 sh "sed -i 's/{GIT_FOLDER}/${GIT_FOLDER}/g' git.sh"
-                sh "sed -i 's/{GIT_URL}/${GIT_URL}/g' git.sh"
+                sh "sed -i 's|{GIT_URL}|${GIT_URL}|g' git.sh"
                 echo "Cloning and Deploying App on Swarm using Grand Master with Instance Id: $MASTER_INSTANCE_ID"
                 sh '''scp -o StrictHostKeyChecking=no \
                         -o UserKnownHostsFile=/dev/null \
