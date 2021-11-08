@@ -152,8 +152,13 @@ pipeline {
             steps {
                 sh "sed -i 's/{SERVERIP}/${MASTER_INSTANCE_PUBLIC_IP}/g' ssl-script.sh"
                 sh "sed -i 's/{FullDomainName}/${FQDN}/g' ssl-script.sh"
+                sh "sed -i 's/{GIT_FOLDER}/${GIT_FOLDER}/g' git.sh"
                 echo "Cloning and Deploying App on Swarm using Grand Master with Instance Id: $MASTER_INSTANCE_ID"
-                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} git clone ${GIT_URL}"
+                sh '''scp -o StrictHostKeyChecking=no \
+                        -o UserKnownHostsFile=/dev/null \
+                        -i ${JENKINS_HOME}/.ssh/${CFN_KEYPAIR}.pem git.sh ec2-user@\"${MASTER_INSTANCE_PUBLIC_IP}":/home/ec2-user/${GIT_FOLDER}
+                    '''
+                sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} bash ${HOME_FOLDER}/git.sh"
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} chmod 777 ${HOME_FOLDER}/${GIT_FOLDER}/deploy.sh "
                 sleep(10)
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} bash ${HOME_FOLDER}/${GIT_FOLDER}/deploy.sh"
