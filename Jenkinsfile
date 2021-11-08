@@ -217,7 +217,7 @@ pipeline {
         }
         success {
             echo 'You are the man/woman...'
-            echo 'You can visit ${MASTER_INSTANCE_ID}:8080 and ${FQDN}'
+            echo "You can visit ${MASTER_INSTANCE_ID}:8080 and ${FQDN}"
         }
     }
 }
