@@ -157,6 +157,10 @@ pipeline {
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} chmod 777 ${HOME_FOLDER}/${GIT_FOLDER}/deploy.sh "
                 sleep(10)
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} bash ${HOME_FOLDER}/${GIT_FOLDER}/deploy.sh"
+                sh '''scp -o StrictHostKeyChecking=no \
+                        -o UserKnownHostsFile=/dev/null \
+                        -i ${JENKINS_HOME}/.ssh/${CFN_KEYPAIR}.pem ssl-script.sh ec2-user@\"${MASTER_INSTANCE_PUBLIC_IP}":/home/ec2-user/${GIT_FOLDER}
+                    '''
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} sudo bash ${HOME_FOLDER}/${GIT_FOLDER}/ssl-script.sh"
             }
         }
