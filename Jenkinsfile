@@ -7,6 +7,8 @@ pipeline {
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         APP_REPO_NAME = "clarusway-repo/phonebook-app"
         APP_NAME = "phonebook"
+        DOMAIN_NAME = "mehmetafsar.net"
+        FQDN = "clarus.mehmetafsar.net"
         AWS_STACK_NAME = "Mehmet-Phonebook-App"
         CFN_TEMPLATE="phonebook-docker-swarm-cfn-template.yml"
         CFN_KEYPAIR="thedoctor"
@@ -148,6 +150,8 @@ pipeline {
                 MASTER_INSTANCE_ID=sh(script:'aws ec2 describe-instances --region ${AWS_REGION} --filters Name=tag-value,Values=docker-grand-master Name=tag-value,Values=${AWS_STACK_NAME} --query Reservations[*].Instances[*].[InstanceId] --output text', returnStdout:true).trim()
             }
             steps {
+                sh "sed -i 's/{SERVERIP}/${MASTER_INSTANCE_PUBLIC_IP}/g' ssl-script.sh"
+                sh "sed -i 's/{FullDomainName}/${FQDN}/g' ssl-script.sh"
                 echo "Cloning and Deploying App on Swarm using Grand Master with Instance Id: $MASTER_INSTANCE_ID"
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} git clone ${GIT_URL}"
                 sh "mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no --region ${AWS_REGION} ${MASTER_INSTANCE_ID} chmod 777 ${HOME_FOLDER}/${GIT_FOLDER}/deploy.sh "
