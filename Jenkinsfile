@@ -5,7 +5,7 @@ pipeline {
         AWS_REGION = "us-east-1"
         AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        APP_REPO_NAME = "clarusway-repo/phonebook-app"
+        APP_REPO_NAME = "clarusway-repo/phonebook-app-qa"
         APP_NAME = "phonebook"
         DOMAIN_NAME = "mehmetafsar.net"
         FQDN = "clarus.mehmetafsar.net"
