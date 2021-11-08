@@ -216,7 +216,7 @@ pipeline {
             sh 'docker image prune -af'
         }
         success {
-            echo 'You can visit ${MASTER_INSTANCE_ID}:8080 and ${FQDN}'
+            echo "You can visit $MASTER_INSTANCE_ID:8080 and https://$FQDN"
         }
     }
 }
