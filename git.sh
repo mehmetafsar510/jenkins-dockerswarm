@@ -1,6 +1,6 @@
 #! /bin/bash
 sh -c '''
-if [ -f "{GIT_FOLDER}" ]
+if [ -d "/home/ec2-user/{GIT_FOLDER}" ]
 then
 rm -rf {GIT_FOLDER}
 git clone {GIT_URL}
